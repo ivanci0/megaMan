@@ -6,10 +6,6 @@ package;
  */
 class Reg
 {
-
-	public function new() 
-	{
-		
-	}
-	
+	public static inline var hSpeed:Float = 300;
+	public static inline var vSpeed:Float = -500;
 }
