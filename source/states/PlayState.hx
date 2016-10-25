@@ -1,5 +1,8 @@
-package;
+package states;
 
+import assets.Bala;
+import assets.Enemigo;
+import assets.Player;
 import flixel.addons.editors.ogmo.FlxOgmoLoader;
 import flixel.FlxG;
 import flixel.FlxObject;
@@ -14,17 +17,23 @@ import flixel.util.FlxColor;
 
 class PlayState extends FlxState
 {
-	var player:FlxSprite;
-	var enemigos:FlxTypedGroup<Enemigo> = new FlxTypedGroup<Enemigo>();
+	var pastito:FlxSprite;
+	var player:Player;
+	var enemigos:FlxTypedGroup<assets.Enemigo> = new FlxTypedGroup<assets.Enemigo>();
 	var cantEnemigos:Int = 1;
 	var contEnemigos:Int = 0;
-	var balasEnemigas:FlxTypedGroup<Bala> = new FlxTypedGroup<Bala>();
+	var balasEnemigas:FlxTypedGroup<assets.Bala> = new FlxTypedGroup<assets.Bala>();
 	//variables para el lvl
 	var ogmoLoader:FlxOgmoLoader;
 	var tileMap:FlxTilemap;
+	
 	override public function create():Void
 	{
 		super.create();
+		
+		//Pastito try
+		pastito = new FlxSprite(0, 0);
+		pastito.loadGraphic(AssetPaths.pastito__png, false);
 		
 		//carga del lvl
 		ogmoLoader = new FlxOgmoLoader(AssetPaths.lvlPrueba__oel);
@@ -32,22 +41,16 @@ class PlayState extends FlxState
 		
 		FlxG.worldBounds.set(0, 0, tileMap.width, tileMap.height);
 		FlxG.camera.setScrollBounds(0, tileMap.width, 0, tileMap.height);
-		
 		tileMap.setTileProperties(0, FlxObject.NONE);
 		tileMap.setTileProperties(1, FlxObject.NONE);
 		tileMap.setTileProperties(2, FlxObject.ANY);
 		ogmoLoader.loadEntities(funcionPosicionar, "entities");
 		
-		player = new FlxSprite(0,0);
-		player.makeGraphic(16, 16, FlxColor.BLUE);
-		player.acceleration.y = 1000;
-		player.health = 100;
-		player.maxVelocity.y -= Reg.vSpeed;
-		
 		FlxG.camera.follow(player);
 		
 		add(tileMap);
 		add(player);
+		add(pastito);
 		for (enemigo in enemigos) 
 		{
 			add(enemigo);
@@ -62,7 +65,7 @@ class PlayState extends FlxState
 	override public function update(elapsed:Float):Void
 	{
 		super.update(elapsed);
-		FlxG.collide(tileMap, player);
+		FlxG.collide(tileMap,player);
 		coliEnemigoFondo(enemigos);
 		colisionEnemigoJugador(enemigos, player);
 		colisionJugadorBalas(balasEnemigas, player);
@@ -72,17 +75,19 @@ class PlayState extends FlxState
 	private function Movimiento():Void{
 		player.velocity.x = 0;
 		
-		if (FlxG.keys.pressed.RIGHT) 
+		if (FlxG.keys.pressed.RIGHT && player.x<1024-player.width) 
 		{
-			player.velocity.x += Reg.hSpeed;
+			player.MoveRight();
+			pastito.x--;
 		}
-		if (FlxG.keys.pressed.LEFT) 
+		if (FlxG.keys.pressed.LEFT && player.x > 0) 
 		{
-			player.velocity.x -= Reg.hSpeed;
+			player.MoveLeft();
+			pastito.x++;
 		}
 		if (FlxG.keys.justPressed.UP && player.isTouching(FlxObject.FLOOR)) 
 		{
-			player.velocity.y = Reg.vSpeed;
+			player.Jump();
 		}
 	}
 	private function funcionPosicionar(entityName:String, entityData:Xml):Void{
@@ -91,22 +96,22 @@ class PlayState extends FlxState
 		
 		if (entityName == "player") 
 		{
-			player = new FlxSprite(_x, _y);
+			player = new Player(0, 0);
 		}
 		if (entityName == "enemigo1") 
 		{
-			enemigos.members[contEnemigos] = new Enemigo(_x, _y);
+			enemigos.members[contEnemigos] = new assets.Enemigo(_x, _y);
 			contEnemigos++;
 		}
 	}
 	//colisiones
-	private function coliEnemigoFondo(enemigo:FlxTypedGroup<Enemigo>):Void{
+	private function coliEnemigoFondo(enemigo:FlxTypedGroup<assets.Enemigo>):Void{
 		for (member in enemigo) 
 		{
 			FlxG.collide(member, tileMap);
 		}
 	}
-	private function colisionEnemigoJugador(enemigo:FlxTypedGroup<Enemigo>,player:FlxSprite):Void{
+	private function colisionEnemigoJugador(enemigo:FlxTypedGroup<assets.Enemigo>,player:FlxSprite):Void{
 		for (member in enemigo) 
 		{
 			if (FlxG.overlap(member,player) )
@@ -116,7 +121,7 @@ class PlayState extends FlxState
 			}
 		}
 	}
-	private function colisionJugadorBalas(balas:FlxTypedGroup<Bala>,player:FlxSprite):Void{
+	private function colisionJugadorBalas(balas:FlxTypedGroup<assets.Bala>,player:FlxSprite):Void{
 		for (bala in balas) 
 		{
 			if (FlxG.overlap(bala,player)) 

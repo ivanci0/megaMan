@@ -1,5 +1,6 @@
-package;
+package assets;
 
+import assets.Bala;
 import flixel.FlxSprite;
 import flixel.system.FlxAssets.FlxGraphicAsset;
 import flixel.util.FlxColor;
@@ -10,11 +11,11 @@ import flixel.util.FlxColor;
  */
 class Enemigo extends FlxSprite
 {
-	public var bala:Bala;
+	public var bala:assets.Bala;
 	public function new(?X:Float=0, ?Y:Float=0) 
 	{
 		super(X, Y);
-		bala = new Bala();
+		bala = new assets.Bala();
 		bala.kill();
 		makeGraphic(16, 16, FlxColor.PINK);
 		acceleration.y = 1000;
