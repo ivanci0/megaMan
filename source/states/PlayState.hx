@@ -1,28 +1,35 @@
 package states;
 
 import assets.Bala;
-import assets.Enemigo;
+import assets.Blaster;
+import assets.OctoBattery;
 import assets.Player;
-import flixel.addons.editors.ogmo.FlxOgmoLoader;
 import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.FlxState;
+import flixel.addons.editors.ogmo.FlxOgmoLoader;
 import flixel.group.FlxGroup.FlxTypedGroup;
-import flixel.text.FlxText;
 import flixel.tile.FlxTilemap;
-import flixel.ui.FlxButton;
-import flixel.math.FlxMath;
-import flixel.util.FlxColor;
 
 class PlayState extends FlxState
 {
 	var pastito:FlxSprite;
 	var player:Player;
-	var enemigos:FlxTypedGroup<assets.Enemigo> = new FlxTypedGroup<assets.Enemigo>();
-	var cantEnemigos:Int = 1;
-	var contEnemigos:Int = 0;
-	var balasEnemigas:FlxTypedGroup<assets.Bala> = new FlxTypedGroup<assets.Bala>();
+	
+	// todas las balas enemigas van aca...
+	var balasEnemigas:FlxTypedGroup<Bala> = new FlxTypedGroup<Bala>();
+	
+	//octos
+	var grupoOcto:FlxTypedGroup<OctoBattery> = new FlxTypedGroup<OctoBattery>();
+	var canOctos:Int = 2;
+	var contOctos:Int = 0;
+	
+	//blasters
+	var grupoBlaster:FlxTypedGroup<Blaster> = new FlxTypedGroup<Blaster>();
+	var canBlaster:Int = 2;
+	var contBlaster:Int = 0;
+	
 	//variables para el lvl
 	var ogmoLoader:FlxOgmoLoader;
 	var tileMap:FlxTilemap;
@@ -51,11 +58,21 @@ class PlayState extends FlxState
 		add(tileMap);
 		add(player);
 		add(pastito);
-		for (enemigo in enemigos) 
+		//add de octopussy
+		for (octo in grupoOcto) 
 		{
-			add(enemigo);
-			balasEnemigas.add(enemigo.bala);
+			add(octo);
 		}
+		// add de blaster y sus balas
+		for (blaster in grupoBlaster) 
+		{
+			add(blaster);
+			for (bala in blaster.getBalas()) 
+			{
+				balasEnemigas.add(bala);
+			}
+		}
+		// add de todas las balas enemigas
 		for (bala in balasEnemigas) 
 		{
 			add(bala);
@@ -65,9 +82,10 @@ class PlayState extends FlxState
 	override public function update(elapsed:Float):Void
 	{
 		super.update(elapsed);
-		FlxG.collide(tileMap,player);
-		coliEnemigoFondo(enemigos);
-		colisionEnemigoJugador(enemigos, player);
+		FlxG.collide(tileMap, player);
+		coliOctoFondo(grupoOcto);
+		coliOctoJugador(grupoOcto, player);
+		coliBlasterJugador(grupoBlaster, player);
 		colisionJugadorBalas(balasEnemigas, player);
 		Movimiento();
 	}
@@ -98,35 +116,61 @@ class PlayState extends FlxState
 		{
 			player = new Player(0, 0);
 		}
-		if (entityName == "enemigo1") 
+		if (entityName == "OctoHor") 
 		{
-			enemigos.members[contEnemigos] = new assets.Enemigo(_x, _y);
-			contEnemigos++;
+			grupoOcto.members[contOctos] = new OctoBattery(_x, _y, Tipo.Horizontal);
+			contOctos++;
+		}
+		if (entityName == "OctoVer") 
+		{
+			grupoOcto.members[contOctos] = new OctoBattery(_x, _y, Tipo.Vertical);
+			contOctos++;
+		}
+		if (entityName == "BlasterDer") 
+		{
+			grupoBlaster.members[contBlaster] = new Blaster(_x, _y, FlxObject.RIGHT);
+			contBlaster++;
+		}
+		if (entityName == "BlasterIzq") 
+		{
+			grupoBlaster.members[contBlaster] = new Blaster(_x, _y, FlxObject.LEFT);
+			contBlaster++;
 		}
 	}
 	//colisiones
-	private function coliEnemigoFondo(enemigo:FlxTypedGroup<assets.Enemigo>):Void{
-		for (member in enemigo) 
+	private function coliOctoFondo(Octos:FlxTypedGroup<OctoBattery>):Void{
+		for (member in Octos) 
 		{
 			FlxG.collide(member, tileMap);
 		}
 	}
-	private function colisionEnemigoJugador(enemigo:FlxTypedGroup<assets.Enemigo>,player:FlxSprite):Void{
-		for (member in enemigo) 
+	private function coliOctoJugador(octos:FlxTypedGroup<OctoBattery>,player:Player):Void{
+		for (member in octos) 
 		{
-			if (FlxG.overlap(member,player) )
+			if (FlxG.overlap(member,player)) 
 			{
 				player.hurt(10);
 				trace(player.health);
 			}
 		}
 	}
-	private function colisionJugadorBalas(balas:FlxTypedGroup<assets.Bala>,player:FlxSprite):Void{
+	private function coliBlasterJugador(blasters:FlxTypedGroup<Blaster>,player:Player):Void{
+		for (blaster in blasters) 
+		{
+			if (FlxG.overlap(blaster, player)) 
+			{
+				player.hurt(10);
+				trace(player.health);
+			}
+		}
+	}
+	private function colisionJugadorBalas(balas:FlxTypedGroup<Bala>,player:Player):Void{
 		for (bala in balas) 
 		{
 			if (FlxG.overlap(bala,player)) 
 			{
 				player.hurt(5);
+				trace(player.health);
 				bala.kill();
 			}
 		}

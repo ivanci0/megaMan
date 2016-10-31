@@ -18,6 +18,7 @@ class Player extends FlxSprite
 		makeGraphic(50, 100, FlxColor.WHITE);
 		acceleration.y = 1000;
 		maxVelocity.y -= Reg.vSpeed;
+		health = 100;
 		
 	}
 	public function MoveRight():Void{
