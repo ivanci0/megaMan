@@ -1,6 +1,8 @@
-package assets;
+package source.assets;
 
+import assets.Bala;
 import flixel.FlxCamera;
+import flixel.FlxG;
 import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.group.FlxGroup.FlxTypedGroup;
@@ -37,9 +39,12 @@ class Blaster extends FlxSprite
 		tipo = _tipo;
 	}
 	public function patronBlaster(otroTimer:FlxTimer):Void{
-		escudo = false;
-		trace("escudo off");
-		timer.start(.75, Disparar, cantBalas + 1);
+		if (isOnScreen(FlxG.camera)) 
+		{
+			escudo = false;
+			trace("escudo off");
+			timer.start(.75, Disparar, cantBalas + 1);
+		}
 	}
 	public function Disparar(timer:FlxTimer):Void{
 		if (contBalas < cantBalas) 
@@ -72,7 +77,7 @@ class Blaster extends FlxSprite
 						angulo = 40;
 				}
 			}
-			if (!balas.members[contBalas].alive) 
+			if (!balas.members[contBalas].alive && isOnScreen(FlxG.camera)) 
 			{
 				balas.members[contBalas].setPosition(x, y + height / 2);
 				balas.members[contBalas].revive();

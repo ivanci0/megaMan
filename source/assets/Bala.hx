@@ -1,7 +1,6 @@
 package assets;
 
 import flixel.FlxG;
-import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.math.FlxPoint;
 import flixel.system.FlxAssets.FlxGraphicAsset;
@@ -18,7 +17,7 @@ class Bala extends FlxSprite
 	{
 		super(X, Y);
 		makeGraphic(4, 2, FlxColor.MAGENTA);
-		velocidad = 200;
+		velocidad = 100;
 	}
 	override public function update(elapsed:Float):Void 
 	{

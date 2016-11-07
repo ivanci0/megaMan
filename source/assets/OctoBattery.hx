@@ -1,4 +1,4 @@
-package assets;
+package source.assets;
 
 import flixel.FlxG;
 import flixel.FlxObject;
