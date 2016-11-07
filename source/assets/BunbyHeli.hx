@@ -33,7 +33,7 @@ class BunbyHeli extends FlxSprite
 		}
 	}
 	public function Disparar():Void{
-		if (!bala.alive && isOnScreen(FlxG.camera)) 
+		if (!bala.alive && isOnScreen(FlxG.camera) && alive) 
 		{
 			bala.setPosition(x + width / 2, y + height / 2);
 			bala.revive();

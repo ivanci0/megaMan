@@ -6,6 +6,7 @@ import flixel.FlxG;
 import flixel.system.FlxSound;
 import flixel.util.FlxColor;
 import flixel.FlxObject;
+import flixel.util.FlxTimer;
 
 /**
  * ...
@@ -13,7 +14,8 @@ import flixel.FlxObject;
  */
 class Player extends FlxSprite
 {
-
+	var timerHurt:FlxTimer;
+	var intocable:Bool;
 	public function new(?X:Float=0, ?Y:Float=0, ?SimpleGraphic:FlxGraphicAsset) 
 	{
 		
@@ -34,6 +36,7 @@ class Player extends FlxSprite
 		acceleration.y = 1000;
 		maxVelocity.y -= Reg.vSpeed;
 		health = 100;
+		timerHurt = new FlxTimer();
 		
 	}
 	public function MoveRight():Void{
@@ -52,7 +55,6 @@ class Player extends FlxSprite
 			velocity.x = -1 * Reg.hSpeed;
 			animation.play("RunR");
 			Reg.faceleft = true;
-
 		}
 	}
 	public function SoundRun():Void{
@@ -81,5 +83,34 @@ class Player extends FlxSprite
 	}
 	public function Air():Void{
 		animation.play("Air");
+	}
+	override public function hurt(Damage:Float):Void 
+	{
+		if (!intocable) 
+		{
+			esHerido();
+			super.hurt(Damage);
+		}
+	}
+	public function esHerido():Void {
+		if (Reg.faceleft) 
+		{
+			velocity.x = 50;
+			velocity.y = -100;
+			animation.play("Jump");
+			Reg.jumpsound.play();
+		}
+		else 
+		{
+			velocity.x = -1 * 50;
+			velocity.y = -100;
+			animation.play("Jump");
+			Reg.jumpsound.play();
+		}
+		intocable = true;
+		timerHurt.start(1.5, setIntocable);
+	}
+	public function setIntocable(timerHurt:FlxTimer):Void{
+		intocable = false;
 	}
 }

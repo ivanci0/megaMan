@@ -42,12 +42,11 @@ class Blaster extends FlxSprite
 		if (isOnScreen(FlxG.camera)) 
 		{
 			escudo = false;
-			trace("escudo off");
 			timer.start(.75, Disparar, cantBalas + 1);
 		}
 	}
 	public function Disparar(timer:FlxTimer):Void{
-		if (contBalas < cantBalas) 
+		if (contBalas < cantBalas && alive) 
 		{
 			if (tipo == FlxObject.LEFT) 
 			{
@@ -89,7 +88,6 @@ class Blaster extends FlxSprite
 		{
 			contBalas = 0;
 			escudo = true;
-			trace("escudo on");
 		}
 	}
 	public function getBalas():FlxTypedGroup<Bala>{

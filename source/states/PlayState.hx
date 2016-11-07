@@ -1,7 +1,9 @@
 package states;
 
 import assets.Bala;
+import assets.Barro;
 import assets.Enemigo;
+import assets.PlatShadow;
 import assets.Player;
 import assets.ShadowBullet;
 import flash.desktop.Clipboard;
@@ -53,6 +55,13 @@ class PlayState extends FlxState
 	var tileMap:FlxTilemap;
 	var pasto:FlxTilemap;
 	
+	// shadow Platform
+	var plati:PlatShadow;
+	//barros
+	var grupoBarro:FlxTypedGroup<Barro> = new FlxTypedGroup<Barro>();
+	var canBarro:Int = 3;
+	var contBarro:Int = 0;
+	
 	override public function create():Void
 	{
 		super.create();
@@ -86,6 +95,16 @@ class PlayState extends FlxState
 		
 		FlxG.camera.follow(player);
 		
+		// shadow plat
+		plati = new PlatShadow(800, 48);
+		// barros
+		var l:Int = 0;
+		for (barro in 0...canBarro) 
+		{
+			grupoBarro.members[barro] = new Barro(550 + l, 80);
+			l += 16;
+		}
+		
 		add(tileMap);
 		add(player);
 		add(pastito);
@@ -114,7 +133,13 @@ class PlayState extends FlxState
 		{
 			add(bala);
 		}
-		
+		//add de plati
+		add(plati);
+		// add de barros
+		for (barro in grupoBarro) 
+		{
+			add(barro);
+		}
 	}
 
 
@@ -130,6 +155,10 @@ class PlayState extends FlxState
 		colisionBalaEnemigos(grupoBunby, grupoBlaster, grupoOcto);
 		//FlxG.overlap(Reg.shadowbullet, tileMap, muerteBala); esto todavia no funca....
 		caidaLibre();
+		// coli de plat
+		FlxG.collide(plati, player);
+		// coli de barros
+		coliDeBarros(grupoBarro, player);
 		
 		//BGM switch
 		if (player.x > Reg.canchalenght - 450){
@@ -329,5 +358,15 @@ class PlayState extends FlxState
 	}
 	private function muerteBala(bala:ShadowBullet,tilemap:Tilemap):Void{
 		bala.destroy();
+	}
+	//prueba
+	private function coliDeBarros(barros:FlxTypedGroup<Barro>, player:Player):Void{
+		for (barro in barros) 
+		{
+			if (FlxG.collide(barro,player)) 
+			{
+				trace("lo toca");
+			}
+		}
 	}
 }
